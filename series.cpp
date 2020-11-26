@@ -1,13 +1,13 @@
 #include <iostream>
-#include <string.h>
-#include <math.h>
+#include <cstring>
+#include <cmath>
+#include <cassert>
 
-using namespace std;
 
 //global definitions:
-const float LOW_NUM = -21269;
-const float HIGH_NUM = 21269;
-const char * const exp_chars[] = { //unicode for superscripts
+constexpr float LOW_NUM = -21269;
+constexpr float HIGH_NUM = 21269;
+const char* EXP_CHARS[] = { //unicode for superscripts
     "\u2070",
     "\u00b9",
     "\u00b2",
@@ -20,56 +20,40 @@ const char * const exp_chars[] = { //unicode for superscripts
     "\u2079",
 };
 
-
-
-
-
-
-
-
-
-
-
-
-long long factorial(int n) 
-{ 
+long long factorial(int n) { 
     long long result = 1; 
     //base cases
     if (n == 0) 
         return 1; 
   
-    //return error 
-    if (n < 0) 
-        return -1; 
+    //error
+    assert(n >= 0);
+
     for (int i = 2; i < n + 1; ++i) 
         result *= i; 
 
     return result; 
 } 
 
-float _sumX(float *x,int n){ // is always smaller than len(x)
+float sumX(float *x,int n){ // is always smaller than len(x)
     float result=0;
-    for(int i = 0; i<= n-1; i++){
+    for(int i = 0; i<n; i++){
         result += (x[i]*(factorial(n)/factorial(n-i)));
     }
 
     return result;
 }
 void fillX(float *x, float *a, int len){
-    float value;
     x[0] = a[0];
     for(int n = 1; n < len; n++){ //loops X[i]
-        x[n] = (a[n] -_sumX(x, n))/factorial(n);
+        x[n] = (a[n] -sumX(x, n))/factorial(n);
     }
 }
 
 
-
-  
-long long __getCombinations(int n, int r) { 
+long long getCombinations(int n, int r) { 
     //the function is only defined for r> n 
-    if (r > n) 
-        return -1; 
+    assert(r <= n);
   
     if (n == r) 
         return 1; 
@@ -77,10 +61,10 @@ long long __getCombinations(int n, int r) {
     if (r == 0) 
         return 1; 
   
-    return __getCombinations(n - 1, r - 1) + __getCombinations(n - 1, r); 
+    return getCombinations(n - 1, r - 1) + getCombinations(n - 1, r); 
 } 
   
-long long _getStirlingNumber(int r, int n) { 
+long long getStirlingNumber(int r, int n) { 
     if (r == n) 
         return 1; 
 
@@ -95,61 +79,61 @@ long long _getStirlingNumber(int r, int n) {
         return factorial(r - 1); 
   
     if (r - n == 1){
-        return __getCombinations(r, 2);
+        return getCombinations(r, 2);
     }
-    else{
-        return (_getStirlingNumber(r - 1, n - 1) + (r - 1) * _getStirlingNumber(r - 1, n));
-    }
+
+    return (getStirlingNumber(r - 1, n - 1) + (r - 1) * getStirlingNumber(r - 1, n));
+
 } 
 
-void fillCoeficients(float *x, float *coeficients, int len){
+void fillCoefficients(float *x, float *coefficients, int len){
     float sum;
     for(int i=0; i< len; i++){
         sum = 0;
         for(int j = len -1; j>=0; j--){
-            //cout << (x[j]) << '-' << _getStirlingNumber(j, i) << '-' << ((((i + j) % 2) == 0)? 1: -1) << endl;
-            sum += ((x[j]) * _getStirlingNumber(j, i) * ((((i + j) % 2) == 0)? 1: -1));
+            
+            sum += ((x[j]) * getStirlingNumber(j, i) * ((((i + j) % 2) == 0)? 1: -1));
         }
-        coeficients[i] = sum;
+        coefficients[i] = sum;
     }
 }
 
-void _print_superscript(int x){
+void print_superscript(int x){
     if(x >= 10)
-       _print_superscript(x / 10);
+       print_superscript(x / 10);
 
     int digit = x % 10;
 
-    std::cout << exp_chars[digit];
+    std::cout << EXP_CHARS[digit];
 }
 
-void printResult(float * coeficients, int len){
+void printResult(float * coefficients, int len){
     int aux, n_digits;
 
     for (int i = len -1; i >=2; i--){
-        if (coeficients[i] != 0){
-            cout << ((coeficients[i] >= 0)? '+': '-');
-            cout << abs(coeficients[i]) << 'n';
+        if (coefficients[i] != 0){
+            std::cout << ((coefficients[i] >= 0)? '+': '-');
+            std::cout << std::fabs(coefficients[i]) << 'n';
             
             //prints the n exponent
-            _print_superscript(i);
+            print_superscript(i);
 
-            cout << ' ';
+            std::cout << ' ';
         }
         
     }
     //print 1 degree
-    if (coeficients[1] != 0){
-        cout << ((coeficients[1] >= 0)? '+': '-');
-        cout << abs(coeficients[1]) << 'n' << ' ';
+    if (coefficients[1] != 0){
+        std::cout << ((coefficients[1] >= 0)? '+': '-');
+        std::cout << std::fabs(coefficients[1]) << 'n' << ' ';
     }
     //print 0 degree
-    if (coeficients[0] != 0){
-        cout << ((coeficients[0] >= 0)? '+': '-');
-        cout << abs(coeficients[0]);
+    if (coefficients[0] != 0){
+        std::cout << ((coefficients[0] >= 0)? '+': '-');
+        std::cout << std::fabs(coefficients[0]);
     }
 
-    cout << endl;
+    std::cout << std::endl;
 }
 
 float randomFloat(float a, float b) {
@@ -163,20 +147,19 @@ float randomInt(int a, int b) {
     return a + rand() % (( b + 1 ) - a);
 }
 
-int main(int argc, char *argv[]){
+int main(int argc, const char *argv[]){
     //generate random seed
     srand(static_cast <unsigned> (time(0)));
 
     int command;
     //read command
 
-
     //main calculation variables
     int num_start_i = 1;//index where numbers start
     int len = argc - num_start_i; //len of number inputs
-    float *a = (float*)malloc((len)*sizeof(float));
-    float *x = (float*)malloc((len)*sizeof(float));
-    float *coeficients = (float*)malloc((len)*sizeof(float));
+    float* a = (float*)malloc((len)*sizeof(float));
+    float* x = (float*)malloc((len)*sizeof(float));
+    float* coefficients = (float*)malloc((len)*sizeof(float));
 
     float input_aux;
     for (int i = num_start_i; i <= (argc - num_start_i); i++){
@@ -194,14 +177,14 @@ int main(int argc, char *argv[]){
     }
 
     fillX(x, a, len);
-    fillCoeficients(x, coeficients, len);
+    fillCoefficients(x, coefficients, len);
 
-    printResult(coeficients, len);
+    printResult(coefficients, len);
 
     //clean memory
-    free(a);
+    free(coefficients);
     free(x);
-    free(coeficients);
+    free(a);
     return 0;
 }
 
