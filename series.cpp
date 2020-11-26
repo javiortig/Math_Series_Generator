@@ -2,7 +2,7 @@
 #include <cstring>
 #include <cmath>
 #include <cassert>
-
+#include <vector>
 
 //global definitions:
 constexpr float LOW_NUM = -21269;
@@ -35,16 +35,19 @@ long long factorial(int n) {
     return result; 
 } 
 
-float sumX(float *x,int n){ // is always smaller than len(x)
+float sumX(std::vector<float> &x,int n){ // is always smaller than len(x)
     float result=0;
+    long long nFact = factorial(n);
+
     for(int i = 0; i<n; i++){
-        result += (x[i]*(factorial(n)/factorial(n-i)));
+        result += (x[i]*(nFact/factorial(n-i)));
     }
 
     return result;
 }
-void fillX(float *x, float *a, int len){
+void fillX(std::vector<float> &x, std::vector<float> &a, int len){
     x[0] = a[0];
+
     for(int n = 1; n < len; n++){ //loops X[i]
         x[n] = (a[n] -sumX(x, n))/factorial(n);
     }
@@ -86,7 +89,7 @@ long long getStirlingNumber(int r, int n) {
 
 } 
 
-void fillCoefficients(float *x, float *coefficients, int len){
+void fillCoefficients(std::vector<float> &x, std::vector<float> &coefficients, int len){
     float sum;
     for(int i=0; i< len; i++){
         sum = 0;
@@ -107,7 +110,7 @@ void print_superscript(int x){
     std::cout << EXP_CHARS[digit];
 }
 
-void printResult(float * coefficients, int len){
+void printResult(std::vector<float> &coefficients, int len){
     int aux, n_digits;
 
     for (int i = len -1; i >=2; i--){
@@ -151,15 +154,14 @@ int main(int argc, const char *argv[]){
     //generate random seed
     srand(static_cast <unsigned> (time(0)));
 
-    int command;
-    //read command
+    assert(argc > 1);//program expects at least 1 number
 
     //main calculation variables
     int num_start_i = 1;//index where numbers start
     int len = argc - num_start_i; //len of number inputs
-    float* a = (float*)malloc((len)*sizeof(float));
-    float* x = (float*)malloc((len)*sizeof(float));
-    float* coefficients = (float*)malloc((len)*sizeof(float));
+    std::vector<float> a(len);       
+    std::vector<float> x(len);
+    std::vector<float> coefficients(len);
 
     float input_aux;
     for (int i = num_start_i; i <= (argc - num_start_i); i++){
@@ -181,10 +183,6 @@ int main(int argc, const char *argv[]){
 
     printResult(coefficients, len);
 
-    //clean memory
-    free(coefficients);
-    free(x);
-    free(a);
     return 0;
 }
 
