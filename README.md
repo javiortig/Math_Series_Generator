@@ -1,5 +1,6 @@
 # Math series generator:
-Introduce any sequence and the program will return a matching math sequence. Remember that sequences start in n=0.
+Introduce any sequence and the program will return a matching math sequence. Remember that sequences start in n=0.  
+This program has a memory complexity of O(n) and an algorithmic efficiency of O(n) as well.
 
 ## Instructions:
 Simply compile the program and then execute it passing the series numbers as arguments. You may also pass 'i' or 'f' instead of a number to use a random integer or float, respectively.
