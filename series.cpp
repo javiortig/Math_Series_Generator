@@ -4,6 +4,11 @@
 #include <cassert>
 #include <vector>
 
+/*
+    This program has a memory complexity of O(n)
+    and an algorithmic efficiency of O(n) as well.
+*/
+
 //global definitions:
 constexpr float LOW_NUM = -21269;
 constexpr float HIGH_NUM = 21269;
@@ -19,28 +24,25 @@ const char* EXP_CHARS[] = { //unicode for superscripts
     "\u2078",
     "\u2079",
 };
+//Factorial results used in multiple functions:
+std::vector<long long> factorials;
 
-long long factorial(int n) { 
-    long long result = 1; 
-    //base cases
-    if (n == 0) 
-        return 1; 
-  
-    //error
-    assert(n >= 0);
 
-    for (int i = 2; i < n + 1; ++i) 
-        result *= i; 
-
-    return result; 
+void fillFactorials(int len) { 
+    assert(len >= 0);
+    long long aux = 1; 
+    factorials[0] = aux;
+    for (int i = 1; i< len; i++){
+        aux *= i;
+        factorials[i] = aux;
+    }
 } 
 
 float sumX(std::vector<float> &x,int n){ // is always smaller than len(x)
     float result=0;
-    long long nFact = factorial(n);
 
     for(int i = 0; i<n; i++){
-        result += (x[i]*(nFact/factorial(n-i)));
+        result += (x[i]*(factorials[n]/factorials[n-i]));
     }
 
     return result;
@@ -49,7 +51,7 @@ void fillX(std::vector<float> &x, std::vector<float> &a, int len){
     x[0] = a[0];
 
     for(int n = 1; n < len; n++){ //loops X[i]
-        x[n] = (a[n] -sumX(x, n))/factorial(n);
+        x[n] = (a[n] -sumX(x, n))/factorials[n];
     }
 }
 
@@ -79,7 +81,7 @@ long long getStirlingNumber(int r, int n) {
         return 0; 
   
     if (n == 1) 
-        return factorial(r - 1); 
+        return factorials[r - 1]; 
   
     if (r - n == 1){
         return getCombinations(r, 2);
@@ -158,10 +160,14 @@ int main(int argc, const char *argv[]){
 
     //main calculation variables
     int num_start_i = 1;//index where numbers start
-    int len = argc - num_start_i; //len of number inputs
+    int len = argc - num_start_i; //len of number of inputs
     std::vector<float> a(len);       
     std::vector<float> x(len);
     std::vector<float> coefficients(len);
+
+    //Fill factorial resutls vector:
+    factorials.resize(len);
+    fillFactorials(len);
 
     float input_aux;
     for (int i = num_start_i; i <= (argc - num_start_i); i++){
